@@ -9,8 +9,6 @@
  */
 
 class NP_ChgSkin2SP extends NucleusPlugin{
-    var $SkinName;
-    
     function getName()       {return 'ChgSkin2SP';}
     function getAuthor()     {return 'kyu';}
     function getVersion()    {return '1.1[2014.05.08]';}
