@@ -11,18 +11,15 @@
 class NP_ChgSkin2SP extends NucleusPlugin{
     var $SkinName;
     
-    function getName(){return 'ChgSkin2SP';}
-    function getAuthor(){return 'kyu';}
-    function getURL(){return 'mailto:kyumfg@gmail.com';}
-    function getVersion(){return '1.1[2014.05.08]';}
-    function getMinNucleusVersion(){return '341';}
+    function getName()       {return 'ChgSkin2SP';}
+    function getAuthor()     {return 'kyu';}
+    function getVersion()    {return '1.1[2014.05.08]';}
+    function getURL()        {return 'mailto:kyumfg@gmail.com';}
     function getDescription(){return 'UserAgentによりスマートホンを判別し、適切なSkinへ振り分けます。スキンに<%ChgSkin2SP%>と記述するとPC表示/スマートホン表示を切り替えるためのリンクを出力します。';}
     
-    function getEventList(){
-        return array(
-            'InitSkinParse',
-        );
-    }
+    function supportsFeature($w) {return in_array($w, array('SqlTablePrefix'));}
+    function getMinNucleusVersion(){return '341';}
+    function getEventList()  {return array('InitSkinParse');}
     
     function install() {
         $this->createOption('spskinname','スマートホン表示で使用するスキン名','text','smartphone');
@@ -35,16 +32,6 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         $this->deleteOption('viewsp');
         $this->deleteOption('viewpc');
     }
-    
-    function supportsFeature($feature) {
-        switch($feature) {
-            case 'SqlTablePrefix':
-                return 1;
-            default:
-                return 0;
-        }
-    }
-    
     
     //スキンパース前処理
     function event_InitSkinParse(&$data){
