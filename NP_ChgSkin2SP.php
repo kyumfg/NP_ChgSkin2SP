@@ -60,7 +60,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
 	    }
 	
 	    $DefaultPCSkinName_str = $data['skin']->name;
-	    $DefaultSPSkinName_str = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES);
+	    $DefaultSPSkinName_str = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
 	
 	    if ($viewmode == 1 || is_null($viewmode)){
 	        if ($this->isSmartPhone() && !SKIN::exists($DefaultSPSkinName_str)){
@@ -113,8 +113,8 @@ class NP_ChgSkin2SP extends NucleusPlugin{
 	    }
 	    $Url = str_replace(strstr($Url,"viewmode"),"",$Url);
 	
-	    $viewsp = htmlspecialchars($this->getOption('viewsp'), ENT_QUOTES);
-	    $viewpc = htmlspecialchars($this->getOption('viewpc'), ENT_QUOTES);
+	    $viewsp = htmlspecialchars($this->getOption('viewsp'), ENT_QUOTES, _CHARSET);
+	    $viewpc = htmlspecialchars($this->getOption('viewpc'), ENT_QUOTES, _CHARSET);
 	
 	    if ($this->isSmartPhone()){
 	        echo "<div class='viewmode'>";
