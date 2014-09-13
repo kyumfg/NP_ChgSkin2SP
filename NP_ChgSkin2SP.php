@@ -68,6 +68,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
 	        }elseif ($this->isSmartPhone() && SKIN::exists($DefaultSPSkinName_str)){
 	            $DefaultSkinName = $DefaultSPSkinName_str;
 	        }
+	        else return;
 	    }elseif ($viewmode == 0){
 	        $DefaultSkinName = $DefaultPCSkinName_str;
 	    }else{
