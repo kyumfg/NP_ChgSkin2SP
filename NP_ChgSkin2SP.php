@@ -33,40 +33,39 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     
     //スキンパース前処理
     function event_InitSkinParse(&$data){
+        
         $viewmode = getVar('viewmode');
-        if (is_null($viewmode)){
+        if (is_null($viewmode))
             $viewmode = cookieVar('viewmode');
-        }
-        if (is_null($viewmode) == false){
+        elseif (is_null($viewmode) == false)
             $viewmode = intval($viewmode);
-        }
+        
         if ($viewmode == 0 || $viewmode == 1){
             setcookie('viewmode', $viewmode);
         }
-    
-        $DefaultPCSkinName_str = $data['skin']->name;
-        $DefaultSPSkinName_str = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
-    
-        if ($viewmode == 1 || is_null($viewmode)){
-            if ($this->isSmartPhone() && !SKIN::exists($DefaultSPSkinName_str)){
-                $DefaultSkinName = $DefaultPCSkinName_str;
-            }elseif ($this->isSmartPhone() && SKIN::exists($DefaultSPSkinName_str)){
-                $DefaultSkinName = $DefaultSPSkinName_str;
+        
+        $request_uri = $_SERVER['REQUEST_URI'];
+        if (strpos($request_uri, '.php') !== false && strpos($request_uri, 'index.php') === false)
+            return;
+        
+        if ($viewmode == 1 || is_null($viewmode))
+        {
+            if ($this->isSmartPhone())
+            {
+                $optionSpskinname = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
+                
+                if(!SKIN::exists($optionSpskinname))
+                    $SkinName = $data['skin']->name;
+                else
+                    $SkinName = $optionSpskinname;
             }
             else return;
-        }elseif ($viewmode == 0){
-            $DefaultSkinName = $DefaultPCSkinName_str;
-        }else{
+        }
+        elseif ($viewmode == 0)
+            $SkinName = $data['skin']->name;
+        else
             return;
-        }
-    
-        If (strpos($_SERVER["REQUEST_URI"],".php") == true){
-            If (strpos($_SERVER["REQUEST_URI"],"index.php") == false){
-                return;
-            }
-        }
-    
-        $SkinName = $DefaultSkinName;
+        
         $skin =& SKIN::createFromName($SkinName);
         $data['skin']->SKIN($skin->getID());
     
