@@ -79,37 +79,29 @@ class NP_ChgSkin2SP extends NucleusPlugin{
             $viewmode = cookieVar('viewmode');
         }
         if (is_null($viewmode)){
-            if ($this->isSmartPhone()){
-                $viewmode = 1;
-            }else{
-                $viewmode = 0;
-            }
-        }else{
-            $viewmode = intval($viewmode);
+            if ($this->isSmartPhone()) $viewmode = 1;
+            else                       $viewmode = 0;
         }
+        else                           $viewmode = intval($viewmode);
     
-        $Url = "http://". $_SERVER["HTTP_HOST"]. $_SERVER["REQUEST_URI"];
-        If (strpos($Url,"?") == false){
-            $Url .= "?viewmode";
-        }
-        If (strpos($Url,"viwemode") == false){
-            $Url .= "&";
-        }
-        $Url = str_replace(strstr($Url,"viewmode"),"",$Url);
-    
-        $viewsp = htmlspecialchars($this->getOption('viewsp'), ENT_QUOTES, _CHARSET);
-        $viewpc = htmlspecialchars($this->getOption('viewpc'), ENT_QUOTES, _CHARSET);
-    
+        $Url = 'http://'. $_SERVER['HTTP_HOST']. $_SERVER['REQUEST_URI'];
+        
+        if (strpos($Url,'?') === false) $Url .= '?';
+        else                            $Url .= '&';
+        
+        $_ = strstr($Url,'viewmode');
+        if(strpos($Url,$_)!==false) $Url = str_replace($_, '', $Url);
+        
         if ($this->isSmartPhone()){
-            echo "<div class='viewmode'>";
-            If ($viewmode == 0){
-                echo "<a href='". $Url. "viewmode=1'>". $viewsp. "</a>";
-            }elseif ($viewmode == 1){
-                echo "<a href='". $Url. "viewmode=0'>", $viewpc. "</a>";
-            }else{
-                return;
-            }
-            echo "</div>";
+            $optionViewsp = htmlspecialchars($this->getOption('viewsp'), ENT_QUOTES, _CHARSET);
+            $optionViewpc = htmlspecialchars($this->getOption('viewpc'), ENT_QUOTES, _CHARSET);
+            $echo = '<div class="viewmode">';
+            if ($viewmode == 0)
+                $echo .= sprintf('<a href="%s">%s</a>', "{$Url}viewmode=1", $optionViewsp);
+            elseif ($viewmode == 1)
+                $echo .= sprintf('<a href="%s">%s</a>', "{$Url}viewmode=0", $optionViewpc);
+            $echo .= '</div>';
+            echo $echo;
         }
     }
     
