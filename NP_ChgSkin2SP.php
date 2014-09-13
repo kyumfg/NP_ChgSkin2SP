@@ -114,61 +114,42 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         }
     }
     
-    
     //UA判定
     function Platform(){
-        $UA = explode("/",$_SERVER['HTTP_USER_AGENT']);
-    
-        // iPhone
-        if(preg_match("/iPhone/",$_SERVER['HTTP_USER_AGENT'])){
-            $phone = array("Platform" => "iPhone","PlatformFlg" => 10);
-    
-        // iPod Touch
-        }elseif(preg_match("/iPod/",$_SERVER['HTTP_USER_AGENT'])){
-            $phone = array("Platform" => "iPhone","PlatformFlg" => 11);
-    
-        //android
-        }elseif(preg_match("/Android/",$_SERVER['HTTP_USER_AGENT'])){
-            $phone = array("Platform" => "Android","PlatformFlg" => 12);
-    
-        //others(PC)
-        }else {
-            $phone = array("Platform" => "pc","PlatformFlg" => 9);
-        }
-        return $phone;
+        $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+        
+        if(strpos($ua, 'iphone')!==false)                                // iPhone
+            $platform = array('Platform' => 'iPhone', 'PlatformFlg' => 10);
+        elseif(strpos($ua, 'ipod')!==false)                              // iPod Touch
+            $platform = array('Platform' => 'iPhone','PlatformFlg' => 11);
+        elseif(strpos($ua, 'android')!==false)                           // android
+            $platform = array('Platform' => 'Android','PlatformFlg' => 12);
+        else                                                             // others(PC)
+            $platform = array('Platform' => 'pc', 'PlatformFlg' => 9);
+        
+        return $platform;
     }
-    
     
     function isiPhone(){
         $PlatForm_ary = $this->Platform();
-        if(
-            $PlatForm_ary["PlatformFlg"] == 10 || 
-            $PlatForm_ary["PlatformFlg"] == 11
-            
-        ){
+        if($PlatForm_ary['PlatformFlg'] == 10 || $PlatForm_ary['PlatformFlg'] == 11)
             return true;
-        }else{
+        else
             return false;
-        }
     }
     
     function isAndroid(){
         $PlatForm_ary = $this->Platform();
-        if($PlatForm_ary["PlatformFlg"] == 12){
+        if($PlatForm_ary['PlatformFlg'] == 12)
             return true;
-        }else{
+        else
             return false;
-        }
     }
     
     function isSmartPhone(){
-        if(
-            $this->isiPhone() ||
-            $this->isAndroid()
-        ){
+        if($this->isiPhone() || $this->isAndroid())
             return true;
-        }else{
+        else
             return false;
-        }
     }
 }
