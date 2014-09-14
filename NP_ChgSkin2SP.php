@@ -33,7 +33,11 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     
     //スキンパース前処理
     function event_InitSkinParse(&$data){
-        
+        if (!$this->isSmartPhone()) return;
+        $request_uri = $_SERVER['REQUEST_URI'];
+        if (strpos($request_uri, '.php') !== false && strpos($request_uri, 'index.php') === false)
+            return;
+
         $viewmode = getVar('viewmode');
         if (is_null($viewmode))
             $viewmode = cookieVar('viewmode');
@@ -43,23 +47,14 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         if ($viewmode == 0 || $viewmode == 1){
             setcookie('viewmode', $viewmode);
         }
-        
-        $request_uri = $_SERVER['REQUEST_URI'];
-        if (strpos($request_uri, '.php') !== false && strpos($request_uri, 'index.php') === false)
-            return;
-        
         if ($viewmode == 1 || is_null($viewmode))
         {
-            if ($this->isSmartPhone())
-            {
                 $optionSpskinname = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
                 
                 if(!SKIN::exists($optionSpskinname))
                     $SkinName = $data['skin']->name;
                 else
                     $SkinName = $optionSpskinname;
-            }
-            else return;
         }
         elseif ($viewmode == 0)
             $SkinName = $data['skin']->name;
@@ -74,6 +69,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     
     //スキン変数
     function doSkinVar(){
+        if (!$this->isSmartPhone()) return;
         $viewmode = getVar('viewmode');
         if (is_null($viewmode)){
             $viewmode = cookieVar('viewmode');
@@ -91,8 +87,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         
         $_ = strstr($Url,'viewmode');
         if(strpos($Url,$_)!==false) $Url = str_replace($_, '', $Url);
-        
-        if ($this->isSmartPhone()){
+        {
             $optionViewsp = htmlspecialchars($this->getOption('viewsp'), ENT_QUOTES, _CHARSET);
             $optionViewpc = htmlspecialchars($this->getOption('viewpc'), ENT_QUOTES, _CHARSET);
             $echo = '<div class="viewmode">';
