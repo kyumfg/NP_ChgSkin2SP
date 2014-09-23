@@ -17,8 +17,8 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     function getURL()        {return 'mailto:kyumfg@gmail.com';}
     function getDescription(){return 'UserAgentによりスマートホンを判別し、適切なSkinへ振り分けます。スキンに<%ChgSkin2SP%>と記述するとPC表示/スマートホン表示を切り替えるためのリンクを出力します。';}
     
-    function supportsFeature($w) {return in_array($w, array('SqlTablePrefix'));}
-    function getMinNucleusVersion(){return '341';}
+    function supportsFeature($w) {return in_array($w, array('SqlTablePrefix','SqlApi'));}
+    function getMinNucleusVersion(){return '350';}
     function getEventList()  {return array('InitSkinParse','PostAddSkin','PostDeleteSkin');}
     
     function install() {
@@ -152,14 +152,14 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     
     function UpdateExtra($data){
         $sql = sprintf("SELECT `oid` FROM `%s` WHERE `opid`='%s' AND `oname`='spskinname'", sql_table('plugin_option_desc'),$this->getID());
-        $res = mysql_fetch_assoc(sql_query($sql));
+        $res = sql_fetch_assoc(sql_query($sql));
         $sql = sprintf("UPDATE `%s` SET `odef`='%s',`oextra`='%s' WHERE `oid`='%s'", sql_table('plugin_option_desc'),$this->DefaultSkin(),$this->SkinList(),$res['oid']);
         sql_query($sql);
     }
     
     function SkinList(){
         $res = sql_query(sprintf('SELECT sdname FROM `%s` ORDER BY `sdname` ASC', sql_table('skin_desc')));
-        while ($_ = mysql_fetch_assoc($res)) {
+        while ($_ = sql_fetch_assoc($res)) {
             $extra .= $_['sdname']."|".$_['sdname']."|";
         }
         $extra = substr($extra,0,strlen($extra)-1);
@@ -170,7 +170,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         $_ = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
         if (empty($_)){
             $sql = sprintf('SELECT sdname FROM `%s` ORDER BY `sdname` ASC', sql_table('skin_desc'));
-            $res = mysql_fetch_assoc(sql_query($sql));
+            $res = sql_fetch_assoc(sql_query($sql));
             $_ = $res['sdname'];
         }
         $this->setOption('spskinname',$_);
