@@ -154,14 +154,14 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     }
     
     function UpdateExtra($data){
-        $sql = "SELECT `oid` FROM `nucleus_plugin_option_desc` WHERE `opid`='".$this->getID()."' AND `oname`='spskinname'";
+        $sql = sprintf("SELECT `oid` FROM `%s` WHERE `opid`='%s' AND `oname`='spskinname'", sql_table('plugin_option_desc'),$this->getID());
         $res = mysql_fetch_assoc(sql_query($sql));
-        $sql = "UPDATE `nucleus_plugin_option_desc` SET `odef`='".$this->DefaultSkin()."',`oextra`='".$this->SkinList()."' WHERE `oid`='".$res['oid']."'";
+        $sql = sprintf("UPDATE `%s` SET `odef`='%s',`oextra`='%s' WHERE `oid`='%s'", sql_table('plugin_option_desc'),$this->DefaultSkin(),$this->SkinList(),$res['oid']);
         sql_query($sql);
     }
     
     function SkinList(){
-        $res = sql_query("SELECT sdname FROM `nucleus_skin_desc` ORDER BY `nucleus_skin_desc`.`sdname` ASC ");
+        $res = sql_query(sprintf('SELECT sdname FROM `%s` ORDER BY `sdname` ASC', sql_table('skin_desc')));
         while ($_ = mysql_fetch_assoc($res)) {
             $extra .= $_['sdname']."|".$_['sdname']."|";
         }
@@ -172,7 +172,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     function DefaultSkin(){
         $_ = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
         if (empty($_)){
-            $sql = "SELECT sdname FROM `nucleus_skin_desc` ORDER BY `nucleus_skin_desc`.`sdname` ASC ";
+            $sql = sprintf('SELECT sdname FROM `%s` ORDER BY `sdname` ASC', sql_table('skin_desc'));
             $res = mysql_fetch_assoc(sql_query($sql));
             $_ = $res['sdname'];
         }
