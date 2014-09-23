@@ -54,8 +54,9 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         elseif(isset($_COOKIE['viewmode']) && preg_match('/^[01]{1}$/',$_COOKIE['viewmode']))
         	$viewmode = intCookieVar('viewmode');
         else $viewmode = 1;
-        
-        setcookie('viewmode', $viewmode, 0, $CONF['CookiePath'], $CONF['CookieDomain'], $CONF['CookieSecure']);
+
+        if(!isset($_COOKIE['viewmode']) || $_COOKIE['viewmode']!=$viewmode)
+            setcookie('viewmode', $viewmode, 0, $CONF['CookiePath'], $CONF['CookieDomain'], $CONF['CookieSecure']);
         
         if ($viewmode == 1)
         {
