@@ -42,6 +42,8 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     }
     
     function event_InitSkinParse(&$data){
+        global $CONF;
+        
         if (!$this->isSmartPhone()) return;
         $request_uri = $_SERVER['REQUEST_URI'];
         if (strpos($request_uri, '.php') !== false && strpos($request_uri, 'index.php') === false)
@@ -57,7 +59,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
             $viewmode = intval($viewmode);
         
         if ($viewmode == 0 || $viewmode == 1)
-            setcookie('viewmode', $viewmode);
+            setcookie('viewmode', $viewmode, 0, $CONF['CookiePath'], $CONF['CookieDomain'], $CONF['CookieSecure']);
         
         if ($viewmode == 1)
         {
