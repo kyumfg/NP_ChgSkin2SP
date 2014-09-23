@@ -49,17 +49,13 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         if (strpos($request_uri, '.php') !== false && strpos($request_uri, 'index.php') === false)
             return;
         
-        $viewmode = getVar('viewmode');
-        if (is_null($viewmode))
-            $viewmode = cookieVar('viewmode');
-            if  (is_null($viewmode))
-                $viewmode = 1;
-            
-        elseif (is_null($viewmode) == false)
-            $viewmode = intval($viewmode);
+        if(isset($_GET['viewmode']) && preg_match('/^[01]{1}$/',$_GET['viewmode']))
+        	$viewmode = intGetVar('viewmode');
+        elseif(isset($_COOKIE['viewmode']) && preg_match('/^[01]{1}$/',$_COOKIE['viewmode']))
+        	$viewmode = intCookieVar('viewmode');
+        else $viewmode = 1;
         
-        if ($viewmode == 0 || $viewmode == 1)
-            setcookie('viewmode', $viewmode, 0, $CONF['CookiePath'], $CONF['CookieDomain'], $CONF['CookieSecure']);
+        setcookie('viewmode', $viewmode, 0, $CONF['CookiePath'], $CONF['CookieDomain'], $CONF['CookieSecure']);
         
         if ($viewmode == 1)
         {
