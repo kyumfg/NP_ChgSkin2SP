@@ -1,24 +1,26 @@
 <?php
-/* NP_ChgSkin2SP v1.3
+/* NP_ChgSkin2SP v1.31
  * 
  * UserAgentによりスマートホンを判別し、適切なSkinへ振り分け
  * Nakazoe氏(nakazoe@comiu.com)作 NP_AdjustSkin2MobileLite 0.2を改造
  * 
- * v1.0 2013.09.21 初版 kyu
- * v1.1 2014.05.08 Feed(RSS/ATOM)パースエラー修正  kyu
- * v1.2 2014.09.14 細かな修正 yama, kyu
- * v1.3 2014.09.20 プラグインオプション設定でスキンの選択をselectに変更 kyu
+ * v1.0  2013.09.21 初版 kyu
+ * v1.1  2014.05.08 Feed(RSS/ATOM)パースエラー修正  kyu
+ * v1.2  2014.09.14 細かな修正 yama, kyu
+ * v1.3  2014.09.20 プラグインオプション設定でスキンの選択をselectに変更 kyu
+ * v1.31 2014.10.13 <%ChgSkin2SP%>を記述しない場合にデバイス判定ができないため修正 yama
+ *                   Nucleusv4.0ではmysql_xxx関数が動作しないため変更 yama
  */
 
 class NP_ChgSkin2SP extends NucleusPlugin{
     function getName()       {return 'ChgSkin2SP';}
     function getAuthor()     {return 'kyu';}
-    function getVersion()    {return '1.3[2014.09.20]';}
+    function getVersion()    {return '1.31[2014.10.13]';}
     function getURL()        {return 'mailto:kyumfg@gmail.com';}
     function getDescription(){return 'UserAgentによりスマートホンを判別し、適切なSkinへ振り分けます。スキンに<%ChgSkin2SP%>と記述するとPC表示/スマートホン表示を切り替えるためのリンクを出力します。';}
     
-    function supportsFeature($w) {return in_array($w, array('SqlTablePrefix'));}
-    function getMinNucleusVersion(){return '341';}
+    function supportsFeature($w) {return in_array($w, array('SqlTablePrefix','SqlApi'));}
+    function getMinNucleusVersion(){return '350';}
     function getEventList()  {return array('InitSkinParse','PostAddSkin','PostDeleteSkin');}
     
     function install() {
@@ -42,22 +44,21 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     }
     
     function event_InitSkinParse(&$data){
+        global $CONF;
+        
         if (!$this->isSmartPhone()) return;
         $request_uri = $_SERVER['REQUEST_URI'];
         if (strpos($request_uri, '.php') !== false && strpos($request_uri, 'index.php') === false)
             return;
         
-        $viewmode = getVar('viewmode');
-        if (is_null($viewmode))
-            $viewmode = cookieVar('viewmode');
-            if  (is_null($viewmode))
-                $viewmode = 1;
-            
-        elseif (is_null($viewmode) == false)
-            $viewmode = intval($viewmode);
-        
-        if ($viewmode == 0 || $viewmode == 1)
-            setcookie('viewmode', $viewmode);
+        if(isset($_GET['viewmode']) && preg_match('/^[01]{1}$/',$_GET['viewmode']))
+        	$viewmode = intGetVar('viewmode');
+        elseif(isset($_COOKIE['viewmode']) && preg_match('/^[01]{1}$/',$_COOKIE['viewmode']))
+        	$viewmode = intCookieVar('viewmode');
+        else $viewmode = 1;
+
+        if(!isset($_COOKIE['viewmode']) || $_COOKIE['viewmode']!=$viewmode)
+            setcookie('viewmode', $viewmode, 0, $CONF['CookiePath'], $CONF['CookieDomain'], $CONF['CookieSecure']);
         
         if ($viewmode == 1)
         {
@@ -152,15 +153,15 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     }
     
     function UpdateExtra($data){
-        $sql = "SELECT `oid` FROM `nucleus_plugin_option_desc` WHERE `opid`='".$this->getID()."' AND `oname`='spskinname'";
-        $res = mysql_fetch_assoc(sql_query($sql));
-        $sql = "UPDATE `nucleus_plugin_option_desc` SET `odef`='".$this->DefaultSkin()."',`oextra`='".$this->SkinList()."' WHERE `oid`='".$res['oid']."'";
+        $sql = sprintf("SELECT `oid` FROM `%s` WHERE `opid`='%s' AND `oname`='spskinname'", sql_table('plugin_option_desc'),$this->getID());
+        $res = sql_fetch_assoc(sql_query($sql));
+        $sql = sprintf("UPDATE `%s` SET `odef`='%s',`oextra`='%s' WHERE `oid`='%s'", sql_table('plugin_option_desc'),$this->DefaultSkin(),$this->SkinList(),$res['oid']);
         sql_query($sql);
     }
     
     function SkinList(){
-        $res = sql_query("SELECT sdname FROM `nucleus_skin_desc` ORDER BY `nucleus_skin_desc`.`sdname` ASC ");
-        while ($_ = mysql_fetch_assoc($res)) {
+        $res = sql_query(sprintf('SELECT sdname FROM `%s` ORDER BY `sdname` ASC', sql_table('skin_desc')));
+        while ($_ = sql_fetch_assoc($res)) {
             $extra .= $_['sdname']."|".$_['sdname']."|";
         }
         $extra = substr($extra,0,strlen($extra)-1);
@@ -170,8 +171,8 @@ class NP_ChgSkin2SP extends NucleusPlugin{
     function DefaultSkin(){
         $_ = htmlspecialchars($this->getOption('spskinname'), ENT_QUOTES, _CHARSET);
         if (empty($_)){
-            $sql = "SELECT sdname FROM `nucleus_skin_desc` ORDER BY `nucleus_skin_desc`.`sdname` ASC ";
-            $res = mysql_fetch_assoc(sql_query($sql));
+            $sql = sprintf('SELECT sdname FROM `%s` ORDER BY `sdname` ASC', sql_table('skin_desc'));
+            $res = sql_fetch_assoc(sql_query($sql));
             $_ = $res['sdname'];
         }
         $this->setOption('spskinname',$_);
