@@ -1,5 +1,5 @@
 <?php
-/* NP_ChgSkin2SP v1.31
+/* NP_ChgSkin2SP v1.32
  * 
  * UserAgentによりスマートホンを判別し、適切なSkinへ振り分け
  * Nakazoe氏(nakazoe@comiu.com)作 NP_AdjustSkin2MobileLite 0.2を改造
@@ -10,6 +10,7 @@
  * v1.3  2014.09.20 プラグインオプション設定でスキンの選択をselectに変更 kyu
  * v1.31 2014.10.13 <%ChgSkin2SP%>を記述しない場合にデバイス判定ができないため修正 yama
  *                   Nucleusv4.0ではmysql_xxx関数が動作しないため変更 yama
+ * v1.32 2015.12.20 Nucleusv3.71betaにてSKIN.phpのクラスのコンストラクタがphp5形式に変更されたため修正 ピヨピヨbird
  */
 
 class NP_ChgSkin2SP extends NucleusPlugin{
@@ -75,8 +76,14 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         else
             return;
         
-        $skin =& SKIN::createFromName($SkinName);
-        $data['skin']->SKIN($skin->getID());
+        $SkinId = SKIN::getIdFromName($SkinName);
+        if ($SkinId)
+        {
+            if (method_exists($data['skin'], "SKIN"))
+                $data['skin']->SKIN($SkinId);
+            else
+                $data['skin']->__construct($SkinId);
+        }
         return;
     }
     
