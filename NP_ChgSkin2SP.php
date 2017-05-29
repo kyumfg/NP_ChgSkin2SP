@@ -87,7 +87,7 @@ class NP_ChgSkin2SP extends NucleusPlugin{
         return;
     }
     
-    function doSkinVar(){
+    function doSkinVar($SkinType){
         if (!$this->isSmartPhone()) return;
         $viewmode = getVar('viewmode');
         if (is_null($viewmode))
